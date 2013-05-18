@@ -32,13 +32,15 @@ module Mini
         sample_book['tags'] = hash_book['tag'].map{ |tag| tag['name'] } if hash_book['tag']
         sample_book['summary'] = hash_book['summary'].join if hash_book['summary']
         sample_book['links'] = hash_book['link'].map{ |m| m['href']} if hash_book['link']
+        sample_book['rating'] = hash_book['rating'].first['average'] if hash_book['rating']
+        sample_book['rater_number'] = hash_book['rating'].first['numRaters'] if hash_book['rating']
         if sample_book['links']
           sample_book['image_url'] = sample_book['links'].select{ |s| s.start_with?('http://img')}.join
           sample_book['api_url'] = sample_book['links'].select{ |s| s.start_with?('http://api')}.join
           sample_book['mobile_url'] = sample_book['links'].select{ |s| s.start_with?('http://m')}.join
           sample_book['website_url'] = sample_book['links'].select{ |s| s.start_with?('http://book')}.join
         end
-        return sample_book
+        return sample_book.inject({}){|book_info,(k,v)| book_info[k.to_sym] = v; book_info}
       end
       hash_book
     end
