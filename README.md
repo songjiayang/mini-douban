@@ -18,7 +18,7 @@ Or install it yourself as:
 
 ## Requirement
 
-    gem install xmlsimple
+    gem install xml-simple
 
 ## Example
 
