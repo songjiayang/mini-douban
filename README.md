@@ -25,9 +25,14 @@ Or install it yourself as:
     require 'mini/douban'
     Mini::Douban.book_api :id=>3420144
 
-参数格式大致为{:id=>3420144, :isbn=>'9781430218333', original=>false}.其中Id 和ISBN至少一个，Id优先.original默认为false,可以不填.
+参数格式大致为
+{:id=>3420144, :isbn=>'9781430218333', original=>false}.
+其中Id 和ISBN至少有一个.Id优先.original默认为false,可以不填.
 
-具体含义：id表示豆瓣对应的图书id;isbn表示对应豆瓣图书的isbn编号(10或13位即可);original表示是否显示原本信息.
+具体含义：
+id表示豆瓣对应的图书id;
+isbn表示对应豆瓣图书的isbn编号(10或13位即可);
+original表示是否显示原本信息.
 
 
 
