@@ -1,5 +1,5 @@
 require "mini/douban/version"
-require 'xmlsimple'
+require 'json'
 require 'net/http'
 
 module Mini
@@ -17,23 +17,23 @@ module Mini
         opts = opts.inject({}){|memo,(k,v)| memo[k.to_sym] = v; memo}
 
         if opts[:id]
-          book_with_xml = Net::HTTP.get_response(URI.parse(BOOK_API_WITH_ID + opts[:id].to_s)).body
+          book_with_json = Net::HTTP.get_response(URI.parse(BOOK_API_WITH_ID + opts[:id].to_s + '?alt=json')).body
         elsif opts[:isbn]
-          book_with_xml = Net::HTTP.get_response(URI.parse(BOOK_API_WITH_ISBN + opts[:isbn].to_s)).body
+          book_with_json = Net::HTTP.get_response(URI.parse(BOOK_API_WITH_ISBN + opts[:isbn].to_s + '?alt=json')).body
         else
           return 'input options lack id or isbn'
         end
 
-        hash_book = XmlSimple.xml_in(book_with_xml)
+        hash_book = JSON.parse(book_with_json)
 
-        if hash_book.include?('attribute') and opts[:original] != true
+        if hash_book.include?('db:attribute') and opts[:original] != true
           sample_book = {}
-          hash_book['attribute'].map{|attr| sample_book[attr['name']] = attr['content']}
-          sample_book['tags'] = hash_book['tag'].map{ |tag| tag['name'] } if hash_book['tag']
-          sample_book['summary'] = hash_book['summary'].join if hash_book['summary']
-          sample_book['links'] = hash_book['link'].map{ |m| m['href']} if hash_book['link']
-          sample_book['rating'] = hash_book['rating'].first['average'] if hash_book['rating']
-          sample_book['rater_number'] = hash_book['rating'].first['numRaters'] if hash_book['rating']
+          hash_book['db:attribute'].map{|attr| sample_book[attr['@name']] = attr['$t']}
+          sample_book['tags'] = hash_book['db:tag'].map{ |tag| tag['@name'] } if hash_book['db:tag']
+          sample_book['summary'] = hash_book['summary']['$t'] if hash_book['summary']
+          sample_book['links'] = hash_book['link'].map{ |m| m['@href']} if hash_book['link']
+          sample_book['rating'] = hash_book['gd:rating']['@average'] if hash_book['gd:rating']
+          sample_book['rater_number'] = hash_book['gd:rating']['@numRaters'] if hash_book['gd:rating']
           if sample_book['links']
             sample_book['image_url'] = sample_book['links'].select{ |s| s.start_with?('http://img')}.join
             sample_book['api_url'] = sample_book['links'].select{ |s| s.start_with?('http://api')}.join
